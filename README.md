@@ -1,6 +1,8 @@
+OBASK tools originated with work carried out to support the [Virtual Fly Brain](virtualflybrain.org) project, the [Allen Cell-Type Knowledge Explorer](https://knowledge.brain-map.org/celltypes) and the [Cell Annotation Platform](celltype.info). Work to split this out into OBASK tools is currently ongoing and so code on this repo should be considered Alpha and may be subject to breaking changes.
+
 # OWL 2 EL <-> Neo4J Mapping "Direct existentials"
 
-This is a preliminary draft of our Neo4J to OWL 2 mapping. The goal is to be able to import a well defined subset of OWL 2 EL ontologies into and export them from Neo4J in such a way that entailments and annotations are preserved (not however the syntactic structure) in the ontology after the round-trip. The main differences of this mapping to other mappings (see References below) are
+The goal of this mapping is to import a well defined subset of OWL 2 EL ontologies into and export them from Neo4J in such a way that entailments and annotations are preserved (not however the syntactic structure) in the ontology after the round-trip. The main differences of this mapping to other mappings (see References below) are
 * its treatment of blank nodes in existential restrictions. Rather than creating blank nodes, we create direct edges between entities, labelled with the property of the existential restriction. This makes querying the graph more intuitive.
 * its use of qualified safe labels for typing relations (which makes for easier querying)
 * taking advantage of OWL implications (rather than relying on pure RDF syntax). Rather than merely mapping an asserted axiom into Neo4J, we are interested in the following **`implied`** relationships:
