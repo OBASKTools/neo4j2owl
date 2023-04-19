@@ -2,6 +2,8 @@ OBASK tools originated with work carried out to support the [Virtual Fly Brain](
 
 # OWL 2 EL <-> Neo4J Mapping "Direct existentials"
 
+This library converts Neo4J to OWL2 and OWL2 to Neo4j using a neo4j:OWL mapping optimised for ease of browsing and querying.  The mapping, described here, supports only a subset of the expressiveness of OWL,  corresponding to: object property axioms and annotation axioms in OWL EL that relate pairs of terms (classes or individuals) + annotation annotations on these axioms with literal values; annotation axioms with literal values + any annotations on these axioms that have literal values.
+
 The goal of this mapping is to import a well defined subset of OWL 2 EL ontologies into and export them from Neo4J in such a way that entailments and annotations are preserved (not however the syntactic structure) in the ontology after the round-trip. The main differences of this mapping to other mappings (see References below) are
 * its treatment of blank nodes in existential restrictions. Rather than creating blank nodes, we create direct edges between entities, labelled with the property of the existential restriction. This makes querying the graph more intuitive.
 * its use of qualified safe labels for typing relations (which makes for easier querying)
