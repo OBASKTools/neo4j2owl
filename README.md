@@ -27,6 +27,7 @@ The most similar mapping to our is the one used by [Monarch Initiatives SciGraph
 * In SciGraph, IRIs are first class citizens everywhere, while we prioritise safe labels to make query construction easier. This is especially important for edge types: Instead of MATCH p=()-[r:`http://purl.obolibrary.org/obo/BFO_0000050`]->() RETURN p LIMIT 25, we prefer to say MATCH p=()-[r:part_of_obo]->() RETURN p LIMIT 25
 * Anonymous class patterns are kept alongside so called "convenience" edges in SciGraph, the latter of which correspond to the way we treat edges in general.
 
+The mapping is also similar to the one used in OAK (see the [OAK guide section on graph projection](https://incatools.github.io/ontology-access-kit/guide/relationships-and-graphs.html#further-notes-on-owl-and-graph-projection)), and is more inclusive than what is used in relation-graph.
 
 Some **ideosyncracies** of our approach are:
 * To be able to roundtrip, we create disconnected nodes in the Neo4J graph representing OWL properties so that we can represent metadata (such as labels or other annotations) pertaining to them.
