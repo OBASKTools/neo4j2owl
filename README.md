@@ -28,7 +28,7 @@ The most similar mapping to our is the one used by [Monarch Initiatives SciGraph
 * Anonymous class patterns are kept alongside so called "convenience" edges in SciGraph, the latter of which correspond to the way we treat edges in general.
 
 
-Some **ideosyncracies** of our approach are:
+Some **idiosyncracies** of our approach are:
 * To be able to roundtrip, we create disconnected nodes in the Neo4J graph representing OWL properties so that we can represent metadata (such as labels or other annotations) pertaining to them.
 * We introduce a number of properties based on the notion of label for easier yet unambiguous querying, which are materialised on all nodes. **qualified safe labels** in particular are used to type relationships. The use of these is predicated on the assumption that, for any given namespace, labels are unique. This should be tested prior to loading. Given an entity e (Example: http://purl.obolibrary.org/obo/BFO_0000050),
   * **ns** corresponds to the namespace the relationship in question in question (Example: http://purl.obolibrary.org/obo/BFO_).
@@ -50,7 +50,7 @@ Some **ideosyncracies** of our approach are:
 | String | xsd:string |  |
 | Boolean | xsd:boolean | |
 | Float | xsd:float |  |
-| list | xsd:string | Follow JSON standard for representing list as string? |
+| list | xsd:string |  |
 
 * For properties and axioms, all annotations are treated as if they were to literals (i.e. they wont be connected to other entities)
 
@@ -103,6 +103,9 @@ All entities in the ontology, i.e. classes, individuals, object properties, data
 | Annotations on individuals to classes | Individual: i Annotations: R A | (:Individual {.. short_form:'i'..})-[r:`SL(R)`]-(:Class {.. short_form:'A'..}) |  |
 
 ## Entity-literal relationships
+
+All annotation axioms with a literal as a value are represented as an node property with a list of one or more literals as a value.  This allows for cases where there are multiple annotation axioms on a single entity using the same annotation property with a literal as a value.
+
 For reasons of feasibility, data property assertions or restrictions, will be incomplete in almost any implementation. In our reference implementation, we only consider asserted data property assertions.
 
 | Concept | OWL 2 EL Axiom | Neo4J Graph Pattern | Comment |
