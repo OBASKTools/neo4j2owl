@@ -27,14 +27,30 @@ public class N2OUtils {
 
 
     static Set<String> getLabels(OWLEntity c, OWLOntology o) {
+        OWLAnnotationProperty labelProperty = df.getRDFSLabel();
         Set<String> labels = new HashSet<>();
-
-        for (OWLAnnotation a : EntitySearcher.getAnnotations(c, o, df.getRDFSLabel())) {
-            OWLAnnotationValue value = a.getValue();
-            if (value instanceof OWLLiteral) {
-                String val = ((OWLLiteral) value).getLiteral();
-                labels.add(val);
+        
+        // Get direct labels if available        
+        for (OWLAnnotationAssertionAxiom ax : o.getAnnotationAssertionAxioms(c.getIRI())) {
+            if (ax.getProperty().equals(labelProperty)) {
+                OWLAnnotationValue value = ax.getValue();
+                if (value instanceof OWLLiteral) {
+                    String val = ((OWLLiteral) value).getLiteral();
+                    labels.add(val);
+                }
             }
+        }
+        
+           
+        if (labels.isEmpty()) {
+	    	// get labels including labels of annotation assertion axioms
+	        for (OWLAnnotation a : EntitySearcher.getAnnotations(c, o, labelProperty)) {
+	            OWLAnnotationValue value = a.getValue();
+	            if (value instanceof OWLLiteral) {
+	                String val = ((OWLLiteral) value).getLiteral();
+	                labels.add(val);
+	            }
+	        }
         }
 
         return labels;
