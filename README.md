@@ -1,6 +1,10 @@
+OBASK tools originated with work carried out to support the [Virtual Fly Brain](virtualflybrain.org) project, the [Allen Cell-Type Knowledge Explorer](https://knowledge.brain-map.org/celltypes) and the [Cell Annotation Platform](celltype.info). Work to split this out into OBASK tools is currently ongoing and so code on this repo should be considered Alpha and may be subject to breaking changes.
+
 # OWL 2 EL <-> Neo4J Mapping "Direct existentials"
 
-This is a preliminary draft of our Neo4J to OWL 2 mapping. The goal is to be able to import a well defined subset of OWL 2 EL ontologies into and export them from Neo4J in such a way that entailments and annotations are preserved (not however the syntactic structure) in the ontology after the round-trip. The main differences of this mapping to other mappings (see References below) are
+This library converts Neo4J to OWL2 and OWL2 to Neo4j using a neo4j:OWL mapping optimised for ease of browsing and querying.  The mapping, described here, supports only a subset of the expressiveness of OWL,  corresponding to: object property axioms and annotation axioms in OWL EL that relate pairs of terms (classes or individuals) + annotation annotations on these axioms with literal values; annotation axioms with literal values + any annotations on these axioms that have literal values.
+
+The goal of this mapping is to import a well defined subset of OWL 2 EL ontologies into and export them from Neo4J in such a way that entailments and annotations are preserved (not however the syntactic structure) in the ontology after the round-trip. The main differences of this mapping to other mappings (see References below) are
 * its treatment of blank nodes in existential restrictions. Rather than creating blank nodes, we create direct edges between entities, labelled with the property of the existential restriction. This makes querying the graph more intuitive.
 * its use of qualified safe labels for typing relations (which makes for easier querying)
 * taking advantage of OWL implications (rather than relying on pure RDF syntax). Rather than merely mapping an asserted axiom into Neo4J, we are interested in the following **`implied`** relationships:
@@ -23,6 +27,7 @@ The most similar mapping to our is the one used by [Monarch Initiatives SciGraph
 * In SciGraph, IRIs are first class citizens everywhere, while we prioritise safe labels to make query construction easier. This is especially important for edge types: Instead of MATCH p=()-[r:`http://purl.obolibrary.org/obo/BFO_0000050`]->() RETURN p LIMIT 25, we prefer to say MATCH p=()-[r:part_of_obo]->() RETURN p LIMIT 25
 * Anonymous class patterns are kept alongside so called "convenience" edges in SciGraph, the latter of which correspond to the way we treat edges in general.
 
+The mapping is also similar to the one used in OAK (see the [OAK guide section on graph projection](https://incatools.github.io/ontology-access-kit/guide/relationships-and-graphs.html#further-notes-on-owl-and-graph-projection)), and is more inclusive than what is used in relation-graph.
 
 Some **ideosyncracies** of our approach are:
 * To be able to roundtrip, we create disconnected nodes in the Neo4J graph representing OWL properties so that we can represent metadata (such as labels or other annotations) pertaining to them.
