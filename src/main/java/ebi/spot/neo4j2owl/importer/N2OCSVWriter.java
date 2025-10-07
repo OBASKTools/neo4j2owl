@@ -77,8 +77,14 @@ public class N2OCSVWriter {
                 "LOAD CSV WITH HEADERS FROM \"file:/"+filename+"\" AS cl\n";
         switch(csv_type) {
             case RELATIONSHIPS:
-                cypher+="MATCH (s:Entity { iri: cl.start}),(e:Entity { iri: cl.end})\n" +
-                        "MERGE (s)-[r:" + type + "]->(e) " + uncomposedSetClauses("cl", "r", manager.getHeadersForRelationships(type));
+                boolean createPerRow = N2OConfig.getInstance().isCreateRelationshipPerRow();
+                String relVerb = createPerRow ? "CREATE" : "MERGE";
+                String setClause = createPerRow
+                    ? uncomposedSetClauses("cl","r",manager.getHeadersForRelationships(type))
+                    : uncomposedAccumulateSetClauses("cl","r",manager.getHeadersForRelationships(type));
+
+                cypher += "MATCH (s:Entity { iri: cl.start}),(e:Entity { iri: cl.end})\n" +
+                        relVerb + " (s)-[r:" + type + "]->(e) " + setClause;
                 break;
             case NODES:
                 cypher+= "MERGE (n:Entity { iri: cl.iri }) " + uncomposedSetClauses("cl", "n", manager.getHeadersForNodes(type)) + " SET n :" + type;
@@ -120,6 +126,27 @@ public class N2OCSVWriter {
             }
         }
         return sb.toString().trim().replaceAll(",$", "");
+    }
+
+    private String uncomposedAccumulateSetClauses(String csvalias, String neovar, Set<String> headers) {
+        StringBuilder sb = new StringBuilder();
+        for (String h : headers) {
+            if (N2OStatic.isN2OBuiltInProperty(h)) {
+                // built-ins: just overwrite
+                sb.append("SET ").append(neovar).append(".").append(h)
+                .append(" = ").append(csvalias).append(".").append(h).append(" ");
+            } else {
+                String function = "to" + computeDatatype(h);
+                // accumulate values rather than overwrite
+                sb.append("SET ").append(neovar).append(".").append(h)
+                .append(" = apoc.coll.toSet(coalesce(")
+                .append(neovar).append(".").append(h).append(",[]) + ")
+                .append("[value IN split(").append(csvalias).append(".").append(h)
+                .append(",\"").append(N2OStatic.ANNOTATION_DELIMITER).append("\") | ")
+                .append(function).append("(trim(value))]) ");
+            }
+        }
+        return sb.toString().trim();
     }
 
     private File getImportDir() {

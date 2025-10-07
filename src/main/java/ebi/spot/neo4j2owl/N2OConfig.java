@@ -15,6 +15,7 @@ import java.util.*;
 
 public class N2OConfig {
     private final N2OLog log = N2OLog.getInstance();
+    private boolean createRelationshipPerRow = false;
     private int periodicCommit = 5000;
     private boolean allow_entities_without_labels = true;
     private boolean addPropertyLabel = true;
@@ -44,6 +45,14 @@ public class N2OConfig {
             config = new N2OConfig();
         }
         return config;
+    }
+
+    public boolean isCreateRelationshipPerRow() {
+        return createRelationshipPerRow;
+    }
+
+    public void setCreateRelationshipPerRow(boolean createRelationshipPerRow) {
+        this.createRelationshipPerRow = createRelationshipPerRow;
     }
 
     private void setAllowEntitiesWithoutLabels(boolean allow_entities_without_labels) {
@@ -158,6 +167,14 @@ public class N2OConfig {
         Yaml yaml = new Yaml();
         InputStream inputStream = new FileInputStream(configfile);
         Map<String, Object> configs = yaml.load(inputStream);
+        if (configs.containsKey("create_relationship_per_row")) {
+            Object val = configs.get("create_relationship_per_row");
+            if (val instanceof Boolean) {
+                N2OConfig.getInstance().setCreateRelationshipPerRow((Boolean) val);
+            } else {
+                log.warning("CONFIG: create_relationship_per_row value is not boolean, skipping.");
+            }
+        }
         if (configs.containsKey("allow_entities_without_labels")) {
             if (configs.get("allow_entities_without_labels") instanceof Boolean) {
                 n2o_config.setAllowEntitiesWithoutLabels((Boolean) configs.get("allow_entities_without_labels"));
